@@ -40,8 +40,6 @@ macro(farm_ng_add_library target)
     file(RELATIVE_PATH abs_include ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${FARM_NG_ARGS_INCLUDE_DIR})
   endif()
 
-  message(STATUS "\n${target}\n\n${CMAKE_SOURCE_DIR}/${abs_include}")
-
   target_include_directories(${target} ${INTERFACE_OR_PUBLIC}
       "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/${abs_include}>"
       "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
