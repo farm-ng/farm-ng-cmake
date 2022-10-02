@@ -39,7 +39,7 @@ macro(farm_ng_export_module)
   cmake_parse_arguments(FARM_NG_EXPORT_MODULE ""
                         "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-		
+
   write_basic_package_version_file(
     ${FARM_NG_EXPORT_MODULE_NAME}ConfigVersion.cmake
     VERSION ${PACKAGE_VERSION}
@@ -47,18 +47,18 @@ macro(farm_ng_export_module)
     )
 
 
-  
+
   # https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html#exporting-targets-from-the-build-tree
   export(EXPORT ${FARM_NG_EXPORT_MODULE_NAME}Targets
     FILE "${CMAKE_CURRENT_BINARY_DIR}/${FARM_NG_EXPORT_MODULE_NAME}Targets.cmake"
     NAMESPACE ${FARM_NG_EXPORT_MODULE_NAME}::
-    )    
+    )
   install(EXPORT  ${FARM_NG_EXPORT_MODULE_NAME}Targets
     FILE ${FARM_NG_EXPORT_MODULE_NAME}Targets.cmake
     NAMESPACE ${FARM_NG_EXPORT_MODULE_NAME}::
     DESTINATION share/${FARM_NG_EXPORT_MODULE_NAME}/cmake
     )
-    
+
   configure_file(${FARM_NG_CMAKE_DIR}/farm_ng_moduleConfig.cmake.in ${FARM_NG_EXPORT_MODULE_NAME}Config.cmake @ONLY)
   install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/${FARM_NG_EXPORT_MODULE_NAME}Config.cmake"
