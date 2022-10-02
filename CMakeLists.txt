@@ -9,7 +9,3 @@ install(DIRECTORY
     DESTINATION
         share/farm_ng_cmake
     )
-
-
-
-
