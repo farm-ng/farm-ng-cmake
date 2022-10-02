@@ -8,5 +8,12 @@ foreach(dep @FARM_NG_EXPORT_MODULE_OPTIONAL_DEPS@)
   find_dependency(${dep})
 endforeach()
 
-include ("${CMAKE_CURRENT_LIST_DIR}/@FARM_NG_EXPORT_MODULE_NAME@Targets.cmake")
+if(@FARM_NG_EXPORT_MODULE_NO_EXPORTS@)
+  include ("${CMAKE_CURRENT_LIST_DIR}/@FARM_NG_EXPORT_MODULE_NAME@Targets.cmake")
+endif()
 
+
+list(APPEND CMAKE_MODULE_PATH 
+    ${CMAKE_CURRENT_LIST_DIR})
+
+message(STATUS ${CMAKE_MODULE_PATH})
