@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
-project(farm_ng_cmake VERSION 0.1.1)
+# don't update VERSION here, its in the farm_ng_cmakeConfigVersion.cmake file
+project(farm_ng_cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(farm_ng_module)
