@@ -9,7 +9,6 @@ ExternalProject_Add(ceres
     -DBUILD_EXAMPLES=OFF
     -DBUILD_SHARED_LIBS=ON
     -DGFLAGS=OFF
-    -DGLOG=OFF
-    -DMINIGLOG=ON
+    -DMINIGLOG=OFF
     -DCMAKE_BUILD_TYPE=RelWithDebInfo
 )

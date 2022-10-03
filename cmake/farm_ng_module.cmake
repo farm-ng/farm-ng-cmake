@@ -1,21 +1,14 @@
 set(FARM_NG_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR})
 include(CMakePackageConfigHelpers)
 
-macro(farm_ng_module name VERSION)
+macro(farm_ng_module)
   # Configure CCache if available
   find_program(CCACHE_FOUND ccache)
   if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
   endif(CCACHE_FOUND)
-  set(FARM_NG_MODULE_NAME ${name})
-  set(farm_ng_VERSION ${VERSION})
 
-  message(STATUS "${FARM_NG_MODULE_NAME} version: -- ${VERSION} --")
-  string(REPLACE "." ";" VERSION_LIST ${VERSION})
-  list(GET VERSION_LIST 0 farm_ng_VERSION_MAJOR)
-  list(GET VERSION_LIST 1 farm_ng_VERSION_MINOR)
-  list(GET VERSION_LIST 2 farm_ng_VERSION_PATCH)
 
   include(CMakeToolsHelpers OPTIONAL)
 

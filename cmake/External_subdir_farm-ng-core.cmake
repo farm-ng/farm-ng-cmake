@@ -5,7 +5,7 @@ ExternalProject_Add(farm-ng-core
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/farm-ng-core-build
     CMAKE_ARGS
         ${farm_ng_DEFAULT_ARGS}
-        -DBUILD_FARM_NG_PROTOS=On
+        -DFARM_NG_BUILD_PROTOS=On
         -Dfarm_ng_cmake_DIR=${farm_ng_cmake_DIR}
     TEST_BEFORE_INSTALL ON
 )
