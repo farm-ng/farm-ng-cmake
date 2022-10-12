@@ -2,6 +2,13 @@ set(farm_ng_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/prefix")
 set(farm_ng_EXT_PREFIX "${CMAKE_BINARY_DIR}/ext")
 set(BUILD_SHARED_LIBS ON)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build." FORCE)
+  message(STATUS "Setting build type to '${CMAKE_BUILD_TYPE}' as none was specified.")
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+
 set(farm_ng_PREFIX_ARGS
   "-DCMAKE_PREFIX_PATH:PATH=${farm_ng_INSTALL_PREFIX};${CMAKE_PREFIX_PATH}"
   "-DCMAKE_INSTALL_PREFIX:PATH=${farm_ng_INSTALL_PREFIX}"
