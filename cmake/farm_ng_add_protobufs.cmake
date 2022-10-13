@@ -1,16 +1,18 @@
-option(FARM_NG_BUILD_PROTOS "Build the farm-ng protobufs" ON)
-if(${FARM_NG_BUILD_PROTOS})
+option(BUILD_FARM_NG_PROTOS "Build the farm-ng protobufs" ON)
+if(${BUILD_FARM_NG_PROTOS})
   find_package(Protobuf REQUIRED)
 endif()
 
 macro(farm_ng_add_protobufs target)
-  if(${FARM_NG_BUILD_PROTOS})
-  set(multi_value_args NAMESPACE PROTO_FILES DEPENDENCIES)
+  if(${BUILD_FARM_NG_PROTOS})
+  set(multi_value_args NAMESPACE PROTO_FILES DEPENDENCIES INCLUDE_DIRS)
+
   cmake_parse_arguments(FARM_NG_ADD_PROTOBUFS "" "" "${multi_value_args}" ${ARGN})
   set(${target}_PROTOBUF_IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Path to this project's protobuf sources")
-  # foreach(_dep_target ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
-  #   list(APPEND DEP_PROTO_INCLUDES  -I ${${_dep_target}_PROTOBUF_IMPORT_DIRS})
-  # endforeach()
+ 
+  foreach(dir ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
+    list(APPEND DEP_PROTO_INCLUDES  -I ${dir})
+  endforeach()
 
 
   if(NOT DEFINED FARM_NG_ADD_PROTOBUFS_NAMESPACE)
@@ -39,7 +41,7 @@ macro(farm_ng_add_protobufs target)
     add_custom_command(
       OUTPUT ${_cpp_out_src} ${_cpp_out_hdr}
       COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-      ARGS ${_protoc_args_cpp} -I ${CMAKE_CURRENT_SOURCE_DIR} ${_full_proto_path}
+      ARGS ${_protoc_args_cpp} -I ${CMAKE_CURRENT_SOURCE_DIR} ${_full_proto_path} ${DEP_PROTO_INCLUDES}
       DEPENDS ${_full_proto_path} ${PROTOBUF_PROTOC_EXECUTABLE}
       COMMENT "Generating cpp protobuf code for ${_proto_path}"
       VERBATIM)
