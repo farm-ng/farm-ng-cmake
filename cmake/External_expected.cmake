@@ -4,5 +4,6 @@ ExternalProject_Add(expected
     PREFIX ${farm_ng_EXT_PREFIX}
     CMAKE_ARGS
     ${farm_ng_DEFAULT_ARGS}
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEXPECTED_BUILD_TESTS=off
+    -DCMAKE_BUILD_TYPE=Release
+    -DEXPECTED_BUILD_TESTS=off
 )

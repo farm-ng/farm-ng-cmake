@@ -64,13 +64,21 @@ macro(farm_ng_export_module)
 endmacro()
 
 macro(farm_ng_external_module NAME)
-  set(one_value_args SOURCE_DIR)
+  set(one_value_args SOURCE_DIR BUILD_TYPE)
   set(multi_value_args DEPENDS MODULE_DEPENDS CMAKE_ARGS)
   cmake_parse_arguments(FARM_NG_ARGS ""
                         "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(_BINARY_DIR                        ${CMAKE_CURRENT_BINARY_DIR}/${NAME}-build)
   set(dep_dir_flags)
+  set(${NAME}_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Choose the type of build.")
+  set_property(CACHE ${NAME}_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+  if(FARM_NG_ARGS_BUILD_TYPE)
+    set(${NAME}_BUILD_TYPE "${FARM_NG_ARGS_BUILD_TYPE}" CACHE STRING "Choose the type of build." FORCE)
+  endif()
+
+
+
   if(FARM_NG_INSTALL_MODULES)
     set(INSTALL_COMMAND_OPTION cmake --build . --target install)
   else()
@@ -91,6 +99,7 @@ macro(farm_ng_external_module NAME)
         ${farm_ng_DEFAULT_ARGS}
         ${FARM_NG_ARGS_CMAKE_ARGS}
         -DBUILD_FARM_NG_PROTOS=ON
+        -DCMAKE_BUILD_TYPE=${${NAME}_BUILD_TYPE}
         -Dfarm_ng_cmake_DIR=${farm_ng_cmake_DIR}
         ${dep_dir_flags}
         TEST_BEFORE_INSTALL OFF

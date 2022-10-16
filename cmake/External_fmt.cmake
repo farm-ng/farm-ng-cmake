@@ -4,7 +4,7 @@ ExternalProject_Add(fmt
     PREFIX ${farm_ng_EXT_PREFIX}
     CMAKE_ARGS
     ${farm_ng_DEFAULT_ARGS}
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    -DCMAKE_BUILD_TYPE=Release
     -DFMT_TEST:BOOL=OFF
     -DBUILD_SHARED_LIBS:BOOL=ON
     )
