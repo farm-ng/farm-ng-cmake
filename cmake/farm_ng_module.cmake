@@ -1,4 +1,6 @@
 set(FARM_NG_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR})
+option(FARM_NG_INSTALL_MODULES "Install farm-ng modules, off by default which makes them in source for development" Off)
+
 include(CMakePackageConfigHelpers)
 
 macro(farm_ng_module)
@@ -59,4 +61,39 @@ macro(farm_ng_export_module)
     DESTINATION
     share/${FARM_NG_EXPORT_MODULE_NAME}/cmake)
 
+endmacro()
+
+macro(farm_ng_external_module NAME)
+  set(one_value_args SOURCE_DIR)
+  set(multi_value_args DEPENDS MODULE_DEPENDS CMAKE_ARGS)
+  cmake_parse_arguments(FARM_NG_ARGS ""
+                        "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(_BINARY_DIR                        ${CMAKE_CURRENT_BINARY_DIR}/${NAME}-build)
+  set(dep_dir_flags)
+  if(FARM_NG_INSTALL_MODULES)
+    set(INSTALL_COMMAND_OPTION cmake --build . --target install)
+  else()
+    set(INSTALL_COMMAND_OPTION cmake -E echo "Skipping install step.")
+    foreach(dep ${FARM_NG_ARGS_MODULE_DEPENDS})
+        set(dep_dir_flags "${dep_dir_flags} -D${dep}_DIR=${CMAKE_CURRENT_BINARY_DIR}/${dep}-build")
+    endforeach()
+  endif()
+
+
+
+    ExternalProject_Add(${NAME}
+        DEPENDS ${FARM_NG_ARGS_DEPENDS} ${FARM_NG_ARGS_MODULE_DEPENDS}
+        PREFIX ${farm_ng_EXT_PREFIX}
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${FARM_NG_ARGS_SOURCE_DIR}
+        BINARY_DIR ${_BINARY_DIR}
+        CMAKE_ARGS
+        ${farm_ng_DEFAULT_ARGS}
+        ${FARM_NG_ARGS_CMAKE_ARGS}
+        -DBUILD_FARM_NG_PROTOS=ON
+        -Dfarm_ng_cmake_DIR=${farm_ng_cmake_DIR}
+        ${dep_dir_flags}
+        TEST_BEFORE_INSTALL OFF
+        INSTALL_COMMAND "${INSTALL_COMMAND_OPTION}"
+    )
 endmacro()
