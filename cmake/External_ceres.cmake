@@ -5,10 +5,10 @@ ExternalProject_Add(ceres
     PREFIX ${farm_ng_EXT_PREFIX}
     CMAKE_ARGS
     ${farm_ng_DEFAULT_ARGS}
+    -DCMAKE_BUILD_TYPE=Release
     -DBUILD_TESTING=OFF
     -DBUILD_EXAMPLES=OFF
     -DBUILD_SHARED_LIBS=ON
     -DGFLAGS=OFF
     -DMINIGLOG=OFF
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo
 )
