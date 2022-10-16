@@ -69,7 +69,7 @@ macro(farm_ng_external_module NAME)
   cmake_parse_arguments(FARM_NG_ARGS ""
                         "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  set(_BINARY_DIR                        ${CMAKE_CURRENT_BINARY_DIR}/${NAME}-build)
+  set(_BINARY_DIR                        ${CMAKE_BINARY_DIR}/${NAME}-build)
   set(dep_dir_flags)
   set(${NAME}_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "Choose the type of build.")
   set_property(CACHE ${NAME}_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
@@ -84,7 +84,7 @@ macro(farm_ng_external_module NAME)
   else()
     set(INSTALL_COMMAND_OPTION cmake -E echo "Skipping install step.")
     foreach(dep ${FARM_NG_ARGS_MODULE_DEPENDS})
-        set(dep_dir_flags "${dep_dir_flags} -D${dep}_DIR=${CMAKE_CURRENT_BINARY_DIR}/${dep}-build")
+        set(dep_dir_flags ${dep_dir_flags};-D${dep}_DIR=${CMAKE_BINARY_DIR}/${dep}-build)
     endforeach()
   endif()
 
