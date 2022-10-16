@@ -9,7 +9,7 @@ macro(farm_ng_add_protobufs target)
 
   cmake_parse_arguments(FARM_NG_ADD_PROTOBUFS "" "" "${multi_value_args}" ${ARGN})
   set(${target}_PROTOBUF_IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Path to this project's protobuf sources")
- 
+
   foreach(dir ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
     list(APPEND DEP_PROTO_INCLUDES  -I ${dir})
   endforeach()
