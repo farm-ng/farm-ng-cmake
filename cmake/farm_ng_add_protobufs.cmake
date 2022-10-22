@@ -14,7 +14,6 @@ macro(farm_ng_add_protobufs target)
     list(APPEND DEP_PROTO_INCLUDES  -I ${dir})
   endforeach()
 
-
   if(NOT DEFINED FARM_NG_ADD_PROTOBUFS_NAMESPACE)
     message(FATAL_ERROR "\nPlease specify NAMESPACE in farm_ng_add_protobufs(${target})\n")
   endif()
@@ -45,6 +44,12 @@ macro(farm_ng_add_protobufs target)
       DEPENDS ${_full_proto_path} ${PROTOBUF_PROTOC_EXECUTABLE}
       COMMENT "Generating cpp protobuf code for ${_proto_path}"
       VERBATIM)
+
+    #message(FATAL_ERROR "${FARM_NG_ARGS_INCLUDE_DIR} ${file} ${rel} ${dir}")
+    install( FILES ${_proto_path}
+      DESTINATION include/${_file_dir}
+      COMPONENT Devel)
+
   endforeach()
 
   farm_ng_add_library(${target}
@@ -67,4 +72,5 @@ macro(farm_ng_add_protobufs target)
     endif()
     add_dependencies(protobuf_all ${target})
   endif()
+
 endmacro()
