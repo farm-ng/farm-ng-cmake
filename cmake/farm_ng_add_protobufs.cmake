@@ -45,7 +45,6 @@ macro(farm_ng_add_protobufs target)
       COMMENT "Generating cpp protobuf code for ${_proto_path}"
       VERBATIM)
 
-    #message(FATAL_ERROR "${FARM_NG_ARGS_INCLUDE_DIR} ${file} ${rel} ${dir}")
     install( FILES ${_proto_path}
       DESTINATION include/${_file_dir}
       COMPONENT Devel)
