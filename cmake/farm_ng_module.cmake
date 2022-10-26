@@ -13,6 +13,9 @@ macro(farm_ng_module)
 
 
   include(CMakeToolsHelpers OPTIONAL)
+  # No NDEBUG for RelWithDebInfo. Among others, this makes sure that essential Eigen
+  # runtime asserts are enabled.
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
 
   set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
   set(BUILD_SHARED_LIBS ON)
