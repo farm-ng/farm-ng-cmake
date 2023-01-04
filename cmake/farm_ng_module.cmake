@@ -25,7 +25,7 @@ macro(farm_ng_module)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     # For clang, c++20 is enabled, but only concepts shall be used from the features newly added.
     set(CMAKE_CXX_STANDARD 20)  
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Wsign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wreorder-ctor -Wreorder-init-list")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Wsign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-local-typedef -Wreorder-ctor -Wreorder-init-list")
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fconcepts") 
