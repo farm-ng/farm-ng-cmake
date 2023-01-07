@@ -1,6 +1,10 @@
 option(BUILD_FARM_NG_PROTOS "Build the farm-ng protobufs" ON)
 if(${BUILD_FARM_NG_PROTOS})
   find_package(Protobuf REQUIRED)
+  #mfind_package(gRPC REQUIRED)
+  find_package(PkgConfig REQUIRED)
+  pkg_search_module(GRPC REQUIRED grpc)
+  pkg_search_module(GRPCPP REQUIRED grpc++>=1.22.0)
 endif()
 
 macro(farm_ng_add_protobufs target)
@@ -31,13 +35,17 @@ macro(farm_ng_add_protobufs target)
 
 
     # cpp
+    #get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
     set("_protoc_args_cpp"
       "--cpp_out=${_proto_output_dir_cpp}")
-    SET(_cpp_out_src ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.pb.cc)
-    SET(_cpp_out_hdr ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.pb.h)
-    list(APPEND _cpp_out_all ${_cpp_out_src} ${_cpp_out_hdr})
-    list(APPEND _cpp_out_sources ${_cpp_out_src})
-    list(APPEND _cpp_out_headers ${_cpp_out_hdr})
+    set("_protoc_args_grpc"
+      "--grpc_cpp_out=${_proto_output_dir_cpp}") # --plugin=\"protoc-gen-grpc=${grpc_cpp_plugin_location}\"")
+    SET(_cpp_out_prefix ${_proto_output_dir_cpp}/${_file_dir}/${_file_we})
+    SET(_cpp_out_src ${_cpp_out_prefix}.pb.cc)
+    SET(_cpp_out_hdr ${_cpp_out_prefix}.pb.h)
+    list(APPEND _cpp_out_all ${_cpp_out_src} ${_cpp_out_hdr} ${_full_proto_path} )
+    list(APPEND _cpp_out_sources ${_cpp_out_src} ${_full_proto_path} )
+    list(APPEND _cpp_out_headers ${_cpp_out_hdr} )
     add_custom_command(
       OUTPUT ${_cpp_out_src} ${_cpp_out_hdr}
       COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
@@ -55,8 +63,17 @@ macro(farm_ng_add_protobufs target)
     SOURCES
       ${_cpp_out_sources})
 
-  target_link_libraries(${target} PUBLIC protobuf::libprotobuf ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
+  target_link_libraries(${target}
+    PUBLIC protobuf::libprotobuf grpc grpc++
+    ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
 
+  MESSAGE(STATUS "PROTO_INCLUDE: ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS}")
+  protobuf_generate(
+    TARGET ${target}
+    LANGUAGE grpc_cpp
+    GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
+    #PLUGIN "protoc-gen-grpc_cpp=${grpc_cpp_plugin_location}"
+    IMPORT_DIRS ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
 
   set_target_properties(${target}
     PROPERTIES CXX_CLANG_TIDY "")
