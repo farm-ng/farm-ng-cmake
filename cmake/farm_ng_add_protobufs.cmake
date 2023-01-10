@@ -1,10 +1,19 @@
 option(BUILD_FARM_NG_PROTOS "Build the farm-ng protobufs" ON)
 if(${BUILD_FARM_NG_PROTOS})
+  # TODO: make less brittle.
+  if(EXISTS "/opt/homebrew/Cellar/openssl@3/3.0.7")
+    set(OPENSSL_ROOT_DIR "/opt/homebrew/Cellar/openssl@3/3.0.7")
+  endif()
+
+  find_package(OpenSSL REQUIRED)
   find_package(Protobuf REQUIRED)
-  #mfind_package(gRPC REQUIRED)
-  find_package(PkgConfig REQUIRED)
-  pkg_search_module(GRPC REQUIRED grpc)
-  pkg_search_module(GRPCPP REQUIRED grpc++>=1.22.0)
+  find_package(gRPC)
+  if(NOT gRPC_FOUND)
+    # fall back to pkg-config
+    find_package(PkgConfig REQUIRED)
+    pkg_search_module(GRPC REQUIRED grpc)
+    pkg_search_module(GRPCPP REQUIRED grpc++>=1.22.0)
+  endif()
 endif()
 
 macro(farm_ng_add_protobufs target)
@@ -25,35 +34,15 @@ macro(farm_ng_add_protobufs target)
 
   set(_proto_output_dir_cpp ${CMAKE_CURRENT_BINARY_DIR})
 
-  # Extract the module name from the target
-  set(_cpp_out_sources)
+  find_program( GRPC_CPP_PLUGIN
+    NAMES grpc_cpp_plugin
+    PATHS
+      /opt/homebrew/bin
+      /usr/bin
+  )
+
+  set(_cpp_out_sources ${FARM_NG_ADD_PROTOBUFS_PROTO_FILES})
   set(_cpp_out_headers)
-  foreach (_proto_path ${FARM_NG_ADD_PROTOBUFS_PROTO_FILES})
-    SET(_full_proto_path ${CMAKE_CURRENT_SOURCE_DIR}/${_proto_path})
-    get_filename_component(_file_we ${_proto_path} NAME_WE)
-    get_filename_component(_file_dir ${_proto_path} DIRECTORY)
-
-
-    # cpp
-    #get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
-    set("_protoc_args_cpp"
-      "--cpp_out=${_proto_output_dir_cpp}")
-    set("_protoc_args_grpc"
-      "--grpc_cpp_out=${_proto_output_dir_cpp}") # --plugin=\"protoc-gen-grpc=${grpc_cpp_plugin_location}\"")
-    SET(_cpp_out_prefix ${_proto_output_dir_cpp}/${_file_dir}/${_file_we})
-    SET(_cpp_out_src ${_cpp_out_prefix}.pb.cc)
-    SET(_cpp_out_hdr ${_cpp_out_prefix}.pb.h)
-    list(APPEND _cpp_out_all ${_cpp_out_src} ${_cpp_out_hdr} ${_full_proto_path} )
-    list(APPEND _cpp_out_sources ${_cpp_out_src} ${_full_proto_path} )
-    list(APPEND _cpp_out_headers ${_cpp_out_hdr} )
-    add_custom_command(
-      OUTPUT ${_cpp_out_src} ${_cpp_out_hdr}
-      COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-      ARGS ${_protoc_args_cpp} -I ${CMAKE_CURRENT_SOURCE_DIR} ${_full_proto_path} ${DEP_PROTO_INCLUDES}
-      DEPENDS ${_full_proto_path} ${PROTOBUF_PROTOC_EXECUTABLE}
-      COMMENT "Generating cpp protobuf code for ${_proto_path}"
-      VERBATIM)
-  endforeach()
 
   farm_ng_add_library(${target}
     NAMESPACE ${FARM_NG_ADD_PROTOBUFS_NAMESPACE}
@@ -64,15 +53,20 @@ macro(farm_ng_add_protobufs target)
       ${_cpp_out_sources})
 
   target_link_libraries(${target}
-    PUBLIC protobuf::libprotobuf grpc grpc++
+    PUBLIC protobuf::libprotobuf gRPC::grpc gRPC::grpc++
     ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
 
-  MESSAGE(STATUS "PROTO_INCLUDE: ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS}")
+  protobuf_generate(
+    TARGET ${target}
+    LANGUAGE cpp
+    GENERATE_EXTENSIONS .pb.h .pb.cc
+    IMPORT_DIRS ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
+
   protobuf_generate(
     TARGET ${target}
     LANGUAGE grpc_cpp
     GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
-    #PLUGIN "protoc-gen-grpc_cpp=${grpc_cpp_plugin_location}"
+    PLUGIN "protoc-gen-grpc_cpp=${GRPC_CPP_PLUGIN}"
     IMPORT_DIRS ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
 
   set_target_properties(${target}
