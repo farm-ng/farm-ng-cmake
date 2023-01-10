@@ -44,16 +44,32 @@ macro(farm_ng_add_protobufs target)
       /usr/bin
   )
 
-  set(_cpp_out_sources ${FARM_NG_ADD_PROTOBUFS_PROTO_FILES})
+
   set(_cpp_out_headers)
+  # Note we populate these files here so we can install them.
+  foreach (_proto_path ${FARM_NG_ADD_PROTOBUFS_PROTO_FILES})
+    SET(_full_proto_path ${CMAKE_CURRENT_SOURCE_DIR}/${_proto_path})
+    get_filename_component(_file_we ${_proto_path} NAME_WE)
+    get_filename_component(_file_dir ${_proto_path} DIRECTORY)
+
+
+    SET(_cpp_out_prefix ${_proto_output_dir_cpp}/${_file_dir}/${_file_we})
+    list(APPEND _cpp_out_headers ${_cpp_out_prefix}.pb.h ${_cpp_out_prefix}.grpc.pb.h)
+
+    get_filename_component( dir ${_proto_path} DIRECTORY )
+    install( FILES ${_proto_path}
+       DESTINATION include/${dir}
+       COMPONENT Devel)
+  endforeach()
 
   farm_ng_add_library(${target}
     NAMESPACE ${FARM_NG_ADD_PROTOBUFS_NAMESPACE}
     INCLUDE_DIR ${_proto_output_dir_cpp}
     HEADERS
-      ${_cpp_out_headers}
+    ${_cpp_out_headers}
     SOURCES
-      ${_cpp_out_sources})
+    ${FARM_NG_ADD_PROTOBUFS_PROTO_FILES}
+    )
 
   target_link_libraries(${target}
     PUBLIC protobuf::libprotobuf gRPC::grpc gRPC::grpc++

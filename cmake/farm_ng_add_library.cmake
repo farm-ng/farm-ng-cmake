@@ -55,7 +55,7 @@ macro(farm_ng_add_library target)
     #message(STATUS "header rel: ${rel}")
 
     get_filename_component( dir ${rel} DIRECTORY )
-    #message(FATAL_ERROR "${FARM_NG_ARGS_INCLUDE_DIR} ${file} ${rel} ${dir}")
+    # message(STATUS "${FARM_NG_ARGS_INCLUDE_DIR} ${file} ${rel} ${dir}")
     install( FILES ${file}
        DESTINATION include/${dir}
        COMPONENT Devel)
