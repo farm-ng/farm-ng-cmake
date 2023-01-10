@@ -7,12 +7,14 @@ if(${BUILD_FARM_NG_PROTOS})
 
   find_package(OpenSSL REQUIRED)
   find_package(Protobuf REQUIRED)
-  find_package(gRPC)
+  find_package(gRPC QUIET)
   if(NOT gRPC_FOUND)
     # fall back to pkg-config
     find_package(PkgConfig REQUIRED)
-    pkg_search_module(GRPC REQUIRED grpc)
-    pkg_search_module(GRPCPP REQUIRED grpc++>=1.22.0)
+    pkg_search_module(GRPC REQUIRED IMPORTED_TARGET grpc)
+    pkg_search_module(GRPCPP REQUIRED IMPORTED_TARGET grpc++>=1.22.0)
+    add_library(gRPC::grpc ALIAS PkgConfig::GRPC)
+    add_library(gRPC::grpc++ ALIAS PkgConfig::GRPCPP)
   endif()
 endif()
 
