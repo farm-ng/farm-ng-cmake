@@ -12,7 +12,8 @@ if(${BUILD_FARM_NG_PROTOS})
     # fall back to pkg-config
     find_package(PkgConfig REQUIRED)
     pkg_search_module(GRPC REQUIRED IMPORTED_TARGET grpc)
-    pkg_search_module(GRPCPP REQUIRED IMPORTED_TARGET grpc++>=1.22.0)
+    pkg_search_module(GRPCPP REQUIRED IMPORTED_TARGET grpc++)
+
     add_library(gRPC::grpc ALIAS PkgConfig::GRPC)
     add_library(gRPC::grpc++ ALIAS PkgConfig::GRPCPP)
   endif()
