@@ -11,16 +11,10 @@ if(${BUILD_FARM_NG_PROTOS})
   if(NOT gRPC_FOUND)
     # fall back to pkg-config
     find_package(PkgConfig REQUIRED)
-    pkg_search_module(GRPC REQUIRED IMPORTED_TARGET grpc)
-    pkg_search_module(GRPCPP REQUIRED IMPORTED_TARGET grpc++)
-
-    add_library(grpc INTERFACE)
-    target_link_libraries(grpc INTERFACE PkgConfig::GRPC)
-
-    add_library(grpc++ INTERFACE)
-    target_link_libraries(grpc++ INTERFACE PkgConfig::GRPCPP)
-    add_library(gRPC::grpc++ ALIAS grpc++)
-    add_library(gRPC::grpc ALIAS grpc)
+    pkg_search_module(GRPC REQUIRED IMPORTED_TARGET GLOBAL grpc)
+    pkg_search_module(GRPCPP REQUIRED IMPORTED_TARGET GLOBAL grpc++)
+    add_library(gRPC::grpc ALIAS PkgConfig::GRPC)
+    add_library(gRPC::grpc++ ALIAS PkgConfig::GRPCPP)
   endif()
 endif()
 
