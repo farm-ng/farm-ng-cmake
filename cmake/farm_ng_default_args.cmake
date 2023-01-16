@@ -1,4 +1,4 @@
-set(farm_ng_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/prefix")
+set(farm_ng_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/prefix" CACHE STRING "Choose where to install things.")
 set(farm_ng_EXT_PREFIX "${CMAKE_BINARY_DIR}/ext")
 set(BUILD_SHARED_LIBS ON)
 
