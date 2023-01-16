@@ -20,6 +20,7 @@ set(farm_ng_DEFAULT_ARGS
   "-DCMAKE_C_COMPILER:PATH=${CMAKE_C_COMPILER}"
   "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
   "-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}"
+  "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=True" # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
   ${farm_ng_PREFIX_ARGS}
 )
 

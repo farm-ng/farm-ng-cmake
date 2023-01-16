@@ -1,6 +1,7 @@
 ExternalProject_Add(fmt
     GIT_REPOSITORY  "https://github.com/fmtlib/fmt.git"
     GIT_TAG "8.1.1"
+    GIT_SHALLOW ON
     PREFIX ${farm_ng_EXT_PREFIX}
     CMAKE_ARGS
     ${farm_ng_DEFAULT_ARGS}
