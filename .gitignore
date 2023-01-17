@@ -1,5 +1,9 @@
 *~
 
+# venv-related
+build.venv
+venv
+
 # Prerequisites
 *.d
 
