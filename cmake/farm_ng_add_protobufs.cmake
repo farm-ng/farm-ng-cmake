@@ -4,7 +4,7 @@ if(${BUILD_FARM_NG_PROTOS})
   # Find Protobuf installation
   # Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.
   set(protobuf_MODULE_COMPATIBLE TRUE)
-  find_package(Protobuf REQUIRED)
+  find_package(Protobuf REQUIRED HINTS ${CMAKE_PREFIX_PATH}/lib/cmake/protobuf)
   message(STATUS "Using protobuf ${Protobuf_VERSION}")
   find_package(gRPC REQUIRED)
   message(STATUS "Using gRPC ${gRPC_VERSION}")
