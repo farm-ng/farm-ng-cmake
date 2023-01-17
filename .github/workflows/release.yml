@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04] # TODO: macos-11
+      fail-fast: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: hendrikmuhs/ccache-action@v1
+        if: matrix.os == 'ubuntu-20.04' || matrix.os == 'macos-11'
+
+      - name: Get short git SHA
+        id: sha
+        run: echo "GIT_SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      # - name: Install system dependencies (Ubuntu)
+      #   run: ./scripts/install_deps_ubuntu.sh
+      #   if: matrix.os == 'ubuntu-20.04'
+
+      # - name: Install system dependencies (Mac)
+      #   run: ./scripts/install_deps_mac.sh
+      #   if: matrix.os == 'macos-11'
+
+      - name: Install venv dependencies
+        # run: ./bootstrap_venv.sh
+        run: |
+          mkdir venv
+          echo "test" > venv/test.log
+
+      - name: Create and upload release
+        run: |
+          git tag ${{ steps.sha.outputs.GIT_SHA_SHORT }}
+          git push origin --tags
+          tar -czvf venv.tar.gz venv
+          gh release create ${{ steps.sha.outputs.GIT_SHA_SHORT }}
+          gh release upload ${{ steps.sha.outputs.GIT_SHA_SHORT }} venv.tar.gz
+          
+
