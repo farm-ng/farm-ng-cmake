@@ -5,14 +5,14 @@ set -e # exit on error
 
 brew install --verbose \
     assimp \
-    boost \
+    # boost \
     catch2 \
     ccache \
-    ceres-solver \
+    # ceres-solver \
     ffmpeg \
     glew \
     glog \
-    grpc \
+    # grpc \
     libjpeg \
     libpng \
     libtiff \
@@ -21,5 +21,5 @@ brew install --verbose \
     openexr \
     openssl \
     pre-commit \
-    protobuf \
+    # protobuf \
     zstd
