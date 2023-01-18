@@ -36,16 +36,9 @@ jobs:
       - name: Install venv dependencies
         run: ./bootstrap_venv.sh
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: venv-${{ matrix.os }}
-          path: venv/prefix
-
-      # #- name: Create and upload release
-      #   run: |
-      #     TAG=v.$(git rev-parse --short HEAD)
-      #     git tag $TAG
-      #     git push origin $TAG
-      #     tar -czvf venv-${{ matrix.os }}.tar.gz venv/prefix
-      #     gh release create $TAG
-      #     gh release upload $TAG venv-${{ matrix.os }}.tar.gz
+      - name: Create and upload release
+        run: |
+           TAG=v.$(git rev-parse --short HEAD)
+           tar -czvf venv-${{ matrix.os }}.tar.gz -C venv/prefix
+           gh release create $TAG
+           gh release upload $TAG venv-${{ matrix.os }}.tar.gz
