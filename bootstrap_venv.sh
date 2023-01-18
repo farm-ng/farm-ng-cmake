@@ -13,7 +13,7 @@ mkdir -p build.venv
 cd build.venv
 cmake \
     -DFARM_NG_DEV_BUILD=On \
-    -Dfarm_ng_INSTALL_PREFIX=$DIR/venv \
+    -Dfarm_ng_INSTALL_PREFIX=$DIR/venv/prefix \
     -G Ninja \
     $DIR/$FARM_NG_CMAKE_PATH
 

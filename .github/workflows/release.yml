@@ -42,9 +42,9 @@ jobs:
 
       - name: Create and upload release
         run: |
-          TAG=v.$(git rev-parse --short HEAD)
+          TAG=v.${{github.run_number}}
           git tag $TAG
           git push origin $TAG
-          tar -czvf venv-${{ matrix.os }}.tar.gz venv
+          tar -czvf venv-${{ matrix.os }}.tar.gz venv/prefix
           gh release create $TAG
           gh release upload $TAG venv-${{ matrix.os }}.tar.gz
