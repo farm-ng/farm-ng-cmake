@@ -7,14 +7,12 @@ pip install -U pip
 pip install -U wheel
 pip install -U cmake ninja
 
-FARM_NG_CMAKE_PATH="${1:-.}"
-
 mkdir -p build.venv
 cd build.venv
 cmake \
     -DFARM_NG_DEV_BUILD=On \
     -Dfarm_ng_INSTALL_PREFIX=$DIR/venv/prefix \
     -G Ninja \
-    $DIR/$FARM_NG_CMAKE_PATH
+    $DIR/.
 
 ninja -v
