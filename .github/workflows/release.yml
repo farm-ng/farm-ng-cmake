@@ -39,6 +39,6 @@ jobs:
       - name: Create and upload release
         run: |
            TAG=v.$(git rev-parse --short HEAD)
-           tar -czvf venv-${{ matrix.os }}.tar.gz -C venv/prefix
+           tar -czvf venv-${{ matrix.os }}.tar.gz -C venv/prefix venv/prefix
            gh release create $TAG
            gh release upload $TAG venv-${{ matrix.os }}.tar.gz
