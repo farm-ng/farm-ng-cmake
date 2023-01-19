@@ -4,6 +4,8 @@ option(FARM_NG_INSTALL_MODULES "Install farm-ng modules, off by default which ma
 include(CMakePackageConfigHelpers)
 
 macro(farm_ng_module)
+
+  message(STATUS "farm_ng_module ${PROJECT_NAME}")
   # Configure CCache if available
   find_program(CCACHE_FOUND ccache)
   if(CCACHE_FOUND)
@@ -20,15 +22,15 @@ macro(farm_ng_module)
   set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
   set(BUILD_SHARED_LIBS ON)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  
+
   # Coarsely, the c++ standard used is c++17 plus concepts from c++20.
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     # For clang, c++20 is enabled, but only concepts shall be used from the features newly added.
-    set(CMAKE_CXX_STANDARD 20)  
+    set(CMAKE_CXX_STANDARD 20)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Wsign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-local-typedef -Wreorder-ctor -Wreorder-init-list")
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fconcepts") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fconcepts")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-but-set-variable -Wno-unused-variable -Wno-unused-function -Wno-maybe-uninitialized")
   endif()
 
@@ -50,16 +52,18 @@ macro(farm_ng_export_module)
     )
 
 
+  add_library(${FARM_NG_EXPORT_MODULE_NAME}_module INTERFACE)
 
   # https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html#exporting-targets-from-the-build-tree
-  export(EXPORT ${FARM_NG_EXPORT_MODULE_NAME}Targets
-    FILE "${CMAKE_CURRENT_BINARY_DIR}/${FARM_NG_EXPORT_MODULE_NAME}Targets.cmake"
-    NAMESPACE ${FARM_NG_EXPORT_MODULE_NAME}::
-    )
   install(EXPORT  ${FARM_NG_EXPORT_MODULE_NAME}Targets
     FILE ${FARM_NG_EXPORT_MODULE_NAME}Targets.cmake
     NAMESPACE ${FARM_NG_EXPORT_MODULE_NAME}::
     DESTINATION share/${FARM_NG_EXPORT_MODULE_NAME}/cmake
+    )
+
+  export(EXPORT ${FARM_NG_EXPORT_MODULE_NAME}Targets
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/${FARM_NG_EXPORT_MODULE_NAME}Targets.cmake"
+    NAMESPACE ${FARM_NG_EXPORT_MODULE_NAME}::
     )
 
   configure_file(${FARM_NG_CMAKE_DIR}/farm_ng_moduleConfig.cmake.in ${FARM_NG_EXPORT_MODULE_NAME}Config.cmake @ONLY)
@@ -69,6 +73,9 @@ macro(farm_ng_export_module)
     DESTINATION
     share/${FARM_NG_EXPORT_MODULE_NAME}/cmake)
 
+  set(${FARM_NG_EXPORT_MODULE_NAME}_PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/protos CACHE STRING "" FORCE)
+  set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
+  export(PACKAGE ${FARM_NG_EXPORT_MODULE_NAME})
 endmacro()
 
 macro(farm_ng_external_module NAME)

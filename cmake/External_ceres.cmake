@@ -2,6 +2,7 @@ ExternalProject_Add(ceres
     DEPENDS eigen
     GIT_REPOSITORY  https://ceres-solver.googlesource.com/ceres-solver
     GIT_TAG "2.1.0"
+    GIT_SHALLOW ON
     PREFIX ${farm_ng_EXT_PREFIX}
     CMAKE_ARGS
     ${farm_ng_DEFAULT_ARGS}

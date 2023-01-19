@@ -1,21 +1,38 @@
 option(BUILD_FARM_NG_PROTOS "Build the farm-ng protobufs" ON)
 if(${BUILD_FARM_NG_PROTOS})
-  # TODO: make less brittle.
-  if(EXISTS "/opt/homebrew/Cellar/openssl@3/3.0.7")
-    set(OPENSSL_ROOT_DIR "/opt/homebrew/Cellar/openssl@3/3.0.7")
+
+  # Find Protobuf installation
+  # Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.
+  set(protobuf_MODULE_COMPATIBLE TRUE)
+  find_package(Protobuf REQUIRED)
+  message(STATUS "Using protobuf ${Protobuf_VERSION}")
+  find_package(gRPC REQUIRED)
+  message(STATUS "Using gRPC ${gRPC_VERSION}")
+
+  # Find gRPC installation
+  # Looks for gRPCConfig.cmake file installed by gRPC's cmake installation.
+  set(_GRPC_GRPCPP gRPC::grpc++)
+  if(CMAKE_CROSSCOMPILING)
+    find_program(_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
+  else()
+    set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
   endif()
 
-  find_package(OpenSSL REQUIRED)
-  find_package(Protobuf REQUIRED)
-  find_package(gRPC QUIET)
-  if(NOT gRPC_FOUND)
-    # fall back to pkg-config
-    find_package(PkgConfig REQUIRED)
-    pkg_search_module(GRPC REQUIRED IMPORTED_TARGET GLOBAL grpc)
-    pkg_search_module(GRPCPP REQUIRED IMPORTED_TARGET GLOBAL grpc++)
-    add_library(gRPC::grpc ALIAS PkgConfig::GRPC)
-    add_library(gRPC::grpc++ ALIAS PkgConfig::GRPCPP)
-  endif()
+  # # TODO: make less brittle.
+  # if(EXISTS "/opt/homebrew/Cellar/openssl@3/3.0.7")
+  #   set(OPENSSL_ROOT_DIR "/opt/homebrew/Cellar/openssl@3/3.0.7")
+  # endif()
+  # find_package(OpenSSL REQUIRED)
+  # find_package(Protobuf REQUIRED)
+  # find_package(gRPC QUIET)
+  # if(NOT gRPC_FOUND)
+  #   # fall back to pkg-config
+  #   find_package(PkgConfig REQUIRED)
+  #   pkg_search_module(GRPC REQUIRED IMPORTED_TARGET GLOBAL grpc)
+  #   pkg_search_module(GRPCPP REQUIRED IMPORTED_TARGET GLOBAL grpc++)
+  #   add_library(gRPC::grpc ALIAS PkgConfig::GRPC)
+  #   add_library(gRPC::grpc++ ALIAS PkgConfig::GRPCPP)
+  # endif()
 endif()
 
 macro(farm_ng_add_protobufs target)
@@ -35,14 +52,6 @@ macro(farm_ng_add_protobufs target)
   endif()
 
   set(_proto_output_dir_cpp ${CMAKE_CURRENT_BINARY_DIR})
-
-  find_program( GRPC_CPP_PLUGIN
-    NAMES grpc_cpp_plugin
-    PATHS
-      /opt/homebrew/bin
-      /usr/bin
-  )
-
 
   set(_cpp_out_headers)
   # Note we populate these files here so we can install them.
@@ -74,6 +83,7 @@ macro(farm_ng_add_protobufs target)
     PUBLIC protobuf::libprotobuf gRPC::grpc gRPC::grpc++
     ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
 
+  #message(FATAL_ERROR ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
   protobuf_generate(
     TARGET ${target}
     LANGUAGE cpp
@@ -84,7 +94,7 @@ macro(farm_ng_add_protobufs target)
     TARGET ${target}
     LANGUAGE grpc_cpp
     GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
-    PLUGIN "protoc-gen-grpc_cpp=${GRPC_CPP_PLUGIN}"
+    PLUGIN "protoc-gen-grpc_cpp=${_GRPC_CPP_PLUGIN_EXECUTABLE}"
     IMPORT_DIRS ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
 
   set_target_properties(${target}

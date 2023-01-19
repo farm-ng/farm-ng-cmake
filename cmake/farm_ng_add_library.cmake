@@ -31,8 +31,11 @@ macro(farm_ng_add_library target)
   # endif()
 
   #set_target_properties(${target} PROPERTIES PUBLIC_HEADER "${FARM_NG_ARGS_HEADERS}")
-
+  if(NOT "${PROJECT_NAME}" STREQUAL "${FARM_NG_ARGS_NAMESPACE}")
+  message(FATAL_ERROR "${PROJECT_NAME} Should match namespace: ${FARM_NG_ARGS_NAMESPACE}")
+  endif()
   add_library(${FARM_NG_ARGS_NAMESPACE}::${target} ALIAS ${target})
+
 
   if(IS_ABSOLUTE ${FARM_NG_ARGS_INCLUDE_DIR})
     file(RELATIVE_PATH abs_include ${CMAKE_SOURCE_DIR} ${FARM_NG_ARGS_INCLUDE_DIR})

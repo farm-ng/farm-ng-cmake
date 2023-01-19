@@ -1,4 +1,8 @@
+name: Release
+
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -8,15 +12,33 @@ concurrency:
 jobs:
   release:
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11]
+        os: [ubuntu-20.04, macos-11] # TODO: macos-11, ubuntu18.04-arm
       fail-fast: false
+    env:
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.ci_pat }}
-          submodules: "recursive"
 
+      - uses: hendrikmuhs/ccache-action@v1
+        if: matrix.os == 'ubuntu-20.04' || matrix.os == 'macos-11'
+
+      - name: Install system dependencies (Ubuntu)
+        run: ./scripts/install_deps_ubuntu.sh
+        if: matrix.os == 'ubuntu-20.04'
+
+      - name: Install system dependencies (Mac)
+        run: ./scripts/install_deps_mac.sh
+        if: matrix.os == 'macos-11'
+
+      - name: Install venv dependencies
+        run: ./bootstrap_venv.sh
+
+      - name: Create and upload release
+        run: |
+           TAG=v.$(git rev-parse --short HEAD)
+           tar -czvf venv-${{ matrix.os }}.tar.gz venv/prefix
+           gh release create $TAG
+           gh release upload $TAG venv-${{ matrix.os }}.tar.gz
