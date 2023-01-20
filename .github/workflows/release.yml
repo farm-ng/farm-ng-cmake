@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches: [main,release-test]
   workflow_dispatch:
 
 concurrency:
@@ -10,14 +10,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  release:
+  # Based on https://dev.to/eugenebabichenko/automated-multi-platform-releases-with-github-actions-1abg
+  create_release:
+    name: Create Release and Provide Upload URL.
+    runs-on: ubuntu-latest # OS to create release, not for build
+    outputs:
+      # This job will provide URL for build jobs to use for uploading assets
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Get short SHA
+        id: get_sha
+        run: echo "sha7=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v.${{ steps.get_sha.outputs.sha7 }}
+          release_name: Release v.${{ steps.get_sha.outputs.sha7 }}
+          draft: false
+          prerelease: false
+
+  build_assets:
+    name: Build Release Assets
+    needs: create_release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11] # TODO: macos-11, ubuntu18.04-arm
+        os: [ubuntu-20.04, macos-11] # TODO: ubuntu18.04-arm
       fail-fast: false
-    env:
-      GH_TOKEN: ${{ github.token }}
 
     steps:
       - uses: actions/checkout@v3
@@ -36,9 +59,16 @@ jobs:
       - name: Install venv dependencies
         run: ./bootstrap_venv.sh
 
-      - name: Create and upload release
+      - name: Create Archive For Release
         run: |
-           TAG=v.$(git rev-parse --short HEAD)
            tar -czvf venv-${{ matrix.os }}.tar.gz venv/prefix
-           gh release create $TAG
-           gh release upload $TAG venv-${{ matrix.os }}.tar.gz
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_name: venv-${{ matrix.os }}.tar.gz
+          asset_path: venv-${{ matrix.os }}.tar.gz
+          asset_content_type: application/x-tar
