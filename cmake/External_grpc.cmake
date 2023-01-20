@@ -1,3 +1,7 @@
+# When using Brew on MacOS, OpenSSL is not installed in a standard search
+# location. This will attempt to find it.
+include(farm_ng_macos_ssl_fix)
+
 # inspired by:
 # https://github.com/grpc/grpc/blob/master/examples/cpp/helloworld/cmake_externalproject/CMakeLists.txt
 ExternalProject_Add(absl
@@ -53,7 +57,6 @@ ExternalProject_Add(re2
   -DRE2_BUILD_TESTING=OFF
   )
 
-
 ExternalProject_Add(grpc
   DEPENDS c-ares protobuf re2 absl
   GIT_REPOSITORY https://github.com/grpc/grpc.git
@@ -63,6 +66,7 @@ ExternalProject_Add(grpc
   CMAKE_ARGS
   ${farm_ng_DEFAULT_ARGS}
   -DCMAKE_BUILD_TYPE=Release
+  -DOPENSSL_ROOT_DIR:PATH=${OPENSSL_ROOT_DIR} # Populated on MacOS
   -DgRPC_INSTALL:BOOL=ON
   -DgRPC_BUILD_TESTS:BOOL=OFF
   -DgRPC_BUILD_MSVC_MP_COUNT:STRING=-1

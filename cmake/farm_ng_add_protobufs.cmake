@@ -1,5 +1,6 @@
 option(BUILD_FARM_NG_PROTOS "Build the farm-ng protobufs" ON)
 if(${BUILD_FARM_NG_PROTOS})
+  include(farm_ng_macos_ssl_fix)
 
   # Find Protobuf installation
   # Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.
@@ -17,22 +18,6 @@ if(${BUILD_FARM_NG_PROTOS})
   else()
     set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
   endif()
-
-  # # TODO: make less brittle.
-  # if(EXISTS "/opt/homebrew/Cellar/openssl@3/3.0.7")
-  #   set(OPENSSL_ROOT_DIR "/opt/homebrew/Cellar/openssl@3/3.0.7")
-  # endif()
-  # find_package(OpenSSL REQUIRED)
-  # find_package(Protobuf REQUIRED)
-  # find_package(gRPC QUIET)
-  # if(NOT gRPC_FOUND)
-  #   # fall back to pkg-config
-  #   find_package(PkgConfig REQUIRED)
-  #   pkg_search_module(GRPC REQUIRED IMPORTED_TARGET GLOBAL grpc)
-  #   pkg_search_module(GRPCPP REQUIRED IMPORTED_TARGET GLOBAL grpc++)
-  #   add_library(gRPC::grpc ALIAS PkgConfig::GRPC)
-  #   add_library(gRPC::grpc++ ALIAS PkgConfig::GRPCPP)
-  # endif()
 endif()
 
 macro(farm_ng_add_protobufs target)
