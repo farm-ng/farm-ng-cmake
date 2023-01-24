@@ -1,6 +1,6 @@
 ExternalProject_Add(cli11
   GIT_REPOSITORY  https://github.com/CLIUtils/CLI11
-  GIT_TAG a227cd10fc6dd2905965bafc2d3aa9cb9d910ce5
+  GIT_TAG v2.3.2
   GIT_SHALLOW ON
   PREFIX ${farm_ng_EXT_PREFIX}
   CMAKE_ARGS
