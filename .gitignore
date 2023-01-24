@@ -4,6 +4,7 @@
 venv.tar.gz
 build.venv
 venv
+venv.tar.gz
 
 # Prerequisites
 *.d
