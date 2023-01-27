@@ -7,10 +7,12 @@ sudo apt-get -qq update
 
 # Please keep this list sorted.
 sudo apt-get -y install \
+     build-essential \
      ccache \
      clang \
      clang-tidy \
      cmake \
+     curl \
      gfortran \
      libassimp-dev \
      libatlas-base-dev \
@@ -29,4 +31,6 @@ sudo apt-get -y install \
      libsuitesparse-dev \
      libswscale-dev \
      libtiff-dev \
+     python3-dev \
+     python3.8-venv \
      && sudo apt-get clean
