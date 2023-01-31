@@ -39,14 +39,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11] # TODO: ubuntu18.04-arm
+        os: [ubuntu-20.04, macos-11, self-hosted] # TODO: ubuntu18.04-arm
       fail-fast: false
 
     steps:
       - uses: actions/checkout@v3
 
       - uses: hendrikmuhs/ccache-action@v1
-        if: matrix.os == 'ubuntu-20.04' || matrix.os == 'macos-11'
 
       - name: Install system dependencies (Ubuntu)
         run: ./scripts/install_deps_ubuntu.sh
@@ -54,7 +53,7 @@ jobs:
 
       - name: Install system dependencies (Mac)
         run: ./scripts/install_deps_mac.sh
-        if: matrix.os == 'macos-11'
+        if: matrix.os == 'macos-11' || matrix.os == 'self-hosted'
 
       - name: Install venv dependencies
         run: ./bootstrap_venv.sh
