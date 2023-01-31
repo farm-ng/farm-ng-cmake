@@ -39,7 +39,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11, self-hosted] # TODO: ubuntu18.04-arm
+        os: [ubuntu-20.04, macos-11, macos-arm64] # TODO: ubuntu18.04-arm
       fail-fast: false
 
     steps:
