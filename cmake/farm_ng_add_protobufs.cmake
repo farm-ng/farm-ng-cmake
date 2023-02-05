@@ -7,16 +7,20 @@ if(${BUILD_FARM_NG_PROTOS})
   set(protobuf_MODULE_COMPATIBLE TRUE)
   find_package(Protobuf REQUIRED)
   message(STATUS "Using protobuf ${Protobuf_VERSION}")
-  find_package(gRPC REQUIRED)
-  message(STATUS "Using gRPC ${gRPC_VERSION}")
+  find_package(gRPC)
+  if(gRPC_FOUND)
+    message(STATUS "Using gRPC ${gRPC_VERSION}")
 
-  # Find gRPC installation
-  # Looks for gRPCConfig.cmake file installed by gRPC's cmake installation.
-  set(_GRPC_GRPCPP gRPC::grpc++)
-  if(CMAKE_CROSSCOMPILING)
-    find_program(_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
+    # Find gRPC installation
+    # Looks for gRPCConfig.cmake file installed by gRPC's cmake installation.
+    set(_GRPC_GRPCPP gRPC::grpc++)
+    if(CMAKE_CROSSCOMPILING)
+      find_program(_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
+    else()
+      set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
+    endif()
   else()
-    set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
+    message(STATUS "gRPC not found")
   endif()
 endif()
 
@@ -39,6 +43,8 @@ macro(farm_ng_add_protobufs target)
   set(_proto_output_dir_cpp ${CMAKE_CURRENT_BINARY_DIR})
 
   set(_cpp_out_headers)
+  find_package(gRPC)
+
   # Note we populate these files here so we can install them.
   foreach (_proto_path ${FARM_NG_ADD_PROTOBUFS_PROTO_FILES})
     SET(_full_proto_path ${CMAKE_CURRENT_SOURCE_DIR}/${_proto_path})
@@ -46,8 +52,13 @@ macro(farm_ng_add_protobufs target)
     get_filename_component(_file_dir ${_proto_path} DIRECTORY)
 
 
+
     SET(_cpp_out_prefix ${_proto_output_dir_cpp}/${_file_dir}/${_file_we})
-    list(APPEND _cpp_out_headers ${_cpp_out_prefix}.pb.h ${_cpp_out_prefix}.grpc.pb.h)
+    if(gRPC_FOUND)
+      list(APPEND _cpp_out_headers ${_cpp_out_prefix}.grpc.pb.h)
+    endif()
+    list(APPEND _cpp_out_headers ${_cpp_out_prefix}.pb.h)
+
 
     get_filename_component( dir ${_proto_path} DIRECTORY )
     install( FILES ${_proto_path}
@@ -64,10 +75,6 @@ macro(farm_ng_add_protobufs target)
     ${FARM_NG_ADD_PROTOBUFS_PROTO_FILES}
     )
 
-  target_link_libraries(${target}
-    PUBLIC protobuf::libprotobuf gRPC::grpc gRPC::grpc++
-    ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
-
   #message(FATAL_ERROR ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
   protobuf_generate(
     TARGET ${target}
@@ -75,20 +82,26 @@ macro(farm_ng_add_protobufs target)
     GENERATE_EXTENSIONS .pb.h .pb.cc
     IMPORT_DIRS ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
 
-  protobuf_generate(
-    TARGET ${target}
-    LANGUAGE grpc_cpp
-    GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
-    PLUGIN "protoc-gen-grpc_cpp=${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-    IMPORT_DIRS ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
+  if(gRPC_FOUND)
+    target_link_libraries(${target}
+      PUBLIC protobuf::libprotobuf gRPC::grpc gRPC::grpc++
+      ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
 
-  set_target_properties(${target}
-    PROPERTIES CXX_CLANG_TIDY "")
+    protobuf_generate(
+      TARGET ${target}
+      LANGUAGE grpc_cpp
+      GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
+      PLUGIN "protoc-gen-grpc_cpp=${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+      IMPORT_DIRS ${FARM_NG_ADD_PROTOBUFS_INCLUDE_DIRS})
 
-    # Create custom target for building all protobus
-    if (NOT TARGET protobuf_all)
-      add_custom_target(protobuf_all)
+    set_target_properties(${target}
+      PROPERTIES CXX_CLANG_TIDY "")
+
+      # Create custom target for building all protobus
+      if (NOT TARGET protobuf_all)
+        add_custom_target(protobuf_all)
+      endif()
+      add_dependencies(protobuf_all ${target})
     endif()
-    add_dependencies(protobuf_all ${target})
   endif()
 endmacro()
