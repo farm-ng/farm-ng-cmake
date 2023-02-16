@@ -16,7 +16,11 @@ if [[ -z "${RELEASE_PLATFORM}" ]]; then
     . /etc/lsb-release
     RELEASE_PLATFORM="${DISTRIB_ID,,}-${DISTRIB_RELEASE}"
   elif [[ "$OSTYPE" == "darwin"* ]]; then
-    RELEASE_PLATFORM="macos-11"
+    if [[ $(uname -m) == 'arm64' ]]; then
+      RELEASE_PLATFORM="macos-arm64"
+    else 
+      RELEASE_PLATFORM="macos-11"
+    fi
   else
     echo "Couldn't guess Platform. Set RELEASE_PLATFORM environment variable."
     false
