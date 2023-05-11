@@ -1,36 +1,38 @@
 cmake_minimum_required(VERSION 3.16)
-# https://semver.org/
-project(farm_ng_all VERSION 0.0.1)
+# don't update VERSION here, its in the farm_ng_cmakeConfigVersion.cmake file
+project(farm_ng_cmake)
 
-if(NOT "$ENV{VIRTUAL_ENV}/prefix" STREQUAL "$ENV{CMAKE_PREFIX_PATH}")
-  message(FATAL_ERROR "CMAKE_PREFIX_PATH does not match current VIRTUAL_ENV path.\n"
-    "ENV{CMAKE_PREFIX_PATH}: '$ENV{CMAKE_PREFIX_PATH}'\n"
-    "ENV{VIRTUAL_ENV}/prefix: '$ENV{VIRTUAL_ENV}/prefix'\n"
-    "Did you forget to activate your virtual environment before running cmake?\n"
-    "# If your venv doesn't exist yet, run:\n"
-    "> ${CMAKE_CURRENT_SOURCE_DIR}/bootstrap_venv.sh\n"
-    "# To active your existing VENV, run:\n"
-    "> source ${CMAKE_CURRENT_SOURCE_DIR}/venv/bin/activate\n"
-    "# If using an IDE, launch it from the terminal after activating.\n"
+# NOTE assumes that cmake is a flat directory
+file(GLOB FARM_NG_CMAKE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/*")
+
+install(FILES
+    ${FARM_NG_CMAKE_FILES}
+    DESTINATION
+        share/farm_ng_cmake/cmake
     )
-endif()
-
-set(CMAKE_PREFIX_PATH $ENV{CMAKE_PREFIX_PATH} CACHE STRING "" FORCE)
-option(BUILD_FOR_AMIGA "Build only Amiga related components" OFF)
-if(BUILD_FOR_AMIGA)
-    message(STATUS "Building subset of project for Amiga platform")
-    set(FARM_NG_BUILD_TESTS=OFF)
-endif()
 
 
-set(farm_ng_cmake_DIR ${CMAKE_CURRENT_SOURCE_DIR}/farm_ng_cmake/cmake)
-set(Pangolin_DIR ${CMAKE_CURRENT_BINARY_DIR}/Pangolin)
-find_package(farm_ng_cmake REQUIRED)
-add_subdirectory(farm_ng_core)
-add_subdirectory(Sophus)
-add_subdirectory(Pangolin)
-add_subdirectory(farm_ng_amiga)
-add_subdirectory(farm_ng_lk)
-if(NOT BUILD_FOR_AMIGA)
-add_subdirectory(farm_ng_spice)
+option(FARM_NG_DEV_BUILD Off)
+if(NOT FARM_NG_DEV_BUILD)
+    message(STATUS "To build farm-ng's development libraries:\n"
+    "cmake -DFARM_NG_DEV_BUILD=ON .")
+    return()
 endif()
+
+list(APPEND CMAKE_MODULE_PATH
+    ${CMAKE_CURRENT_LIST_DIR}/cmake)
+# here we build a c++ development environment
+include(ExternalProject)
+include(farm_ng_default_args)
+
+include(External_fmt)
+include(External_expected)
+include(External_eigen)
+include(External_ceres)
+include(External_apriltag)
+include(External_cli11)
+include(External_boost)
+include(External_grpc)
+include(External_nlohmann_json)
+include(External_libdatachannel)
+
