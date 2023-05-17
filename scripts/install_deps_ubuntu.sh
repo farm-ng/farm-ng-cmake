@@ -33,4 +33,6 @@ sudo apt-get -y install \
      libtiff-dev \
      python3-dev \
      python3.8-venv \
+     libmtdev-dev \
+     libturbojpeg \
      && sudo apt-get clean
