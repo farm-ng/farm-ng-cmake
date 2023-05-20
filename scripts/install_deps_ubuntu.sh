@@ -26,13 +26,14 @@ sudo apt-get -y install \
      libglew-dev \
      libgoogle-glog-dev \
      libgtest-dev \
+     libmtdev-dev \
      libopencv-dev \
      libssl-dev \
      libsuitesparse-dev \
      libswscale-dev \
      libtiff-dev \
+     libturbojpeg \
+     libturbojpeg-dev \
      python3-dev \
      python3.8-venv \
-     libmtdev-dev \
-     libturbojpeg \
      && sudo apt-get clean
