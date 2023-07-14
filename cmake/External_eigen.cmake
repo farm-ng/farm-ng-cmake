@@ -1,6 +1,6 @@
 ExternalProject_Add(eigen
     GIT_REPOSITORY  https://gitlab.com/libeigen/eigen.git
-    GIT_TAG "3.4.0"
+    GIT_TAG "bc57b926a0214340c67d91501f4672a014ecf8fe"
     GIT_SHALLOW ON
     PREFIX ${farm_ng_EXT_PREFIX}
     CMAKE_ARGS
