@@ -18,7 +18,7 @@ if [[ -z "${RELEASE_PLATFORM}" ]]; then
   elif [[ "$OSTYPE" == "darwin"* ]]; then
     if [[ $(uname -m) == 'arm64' ]]; then
       RELEASE_PLATFORM="macos-arm64"
-    else 
+    else
       RELEASE_PLATFORM="macos-11"
     fi
   else

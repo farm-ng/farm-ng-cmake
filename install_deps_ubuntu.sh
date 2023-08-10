@@ -24,16 +24,15 @@ sudo apt-get -y install \
      libcrypto++-dev \
      libegl1-mesa-dev \
      libglew-dev \
-     libglm-dev \
      libgoogle-glog-dev \
      libgtest-dev \
+     libmtdev-dev \
      libopencv-dev \
      libssl-dev \
      libsuitesparse-dev \
      libswscale-dev \
      libtiff-dev \
+     libturbojpeg \
      python3-dev \
      python3.8-venv \
-     libmtdev-dev \
-     libturbojpeg \
      && sudo apt-get clean
