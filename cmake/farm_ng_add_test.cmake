@@ -2,6 +2,7 @@ option(${PROJECT_NAME}_BUILD_TESTS "Build this projects tests" ON)
 option(FARM_NG_BUILD_TESTS "Build this projects tests" ON)
 
 macro(farm_ng_enable_testing)
+  message("farm_ng_enable_testing: " ${PROJECT_NAME} )
   if(${FARM_NG_BUILD_TESTS} AND ${${PROJECT_NAME}_BUILD_TESTS})
     # from https://google.github.io/googletest/quickstart-cmake.html
     include(FetchContent)
